@@ -7,15 +7,15 @@ package persons
 
 import (
 	"context"
+	"database/sql"
 )
 
-const deletePerson = `-- name: DeletePerson :exec
+const deletePerson = `-- name: DeletePerson :execresult
 DELETE FROM persons WHERE id = ?
 `
 
-func (q *Queries) DeletePerson(ctx context.Context, id int64) error {
-	_, err := q.exec(ctx, q.deletePersonStmt, deletePerson, id)
-	return err
+func (q *Queries) DeletePerson(ctx context.Context, id int64) (sql.Result, error) {
+	return q.exec(ctx, q.deletePersonStmt, deletePerson, id)
 }
 
 const insertPerson = `-- name: InsertPerson :one

@@ -21,5 +21,5 @@ SET
 WHERE id = ?
 RETURNING *;
 
--- name: DeletePerson :exec
+-- name: DeletePerson :execresult
 DELETE FROM persons WHERE id = ?;

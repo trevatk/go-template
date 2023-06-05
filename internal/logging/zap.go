@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// New
+// New create new uber/zap logger instance
 func New() (*zap.Logger, error) {
 
 	logger, err := zap.NewDevelopment()

@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-// NewSQLite
+// NewSQLite create new sqlite database connection
 func NewSQLite() (*sql.DB, error) {
 
 	dsn := os.Getenv("SQLITE_DSN")

@@ -5,7 +5,7 @@ type Bundle struct {
 	PersonService *PersonService
 }
 
-// NewBundle
+// NewBundle create new service bundle
 func NewBundle(personService *PersonService) *Bundle {
 	return &Bundle{
 		PersonService: personService,
