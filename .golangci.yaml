@@ -1,9 +1,6 @@
 linters-settings:
   gosec:
     exclude-generated: true
-    config:
-      global:
-        audit: true
 
 run:
   timeout: 5m
