@@ -1,6 +1,5 @@
-
 build:
-	docker build -t trevatk/go-template:latest -f ./docker/Dockerfile .
+	docker build -t trevatk/go-template:latest .
 
 deps:
 	go mod tidy
