@@ -1,3 +1,4 @@
+// Package port exposed endpoints
 package port
 
 import (
@@ -15,19 +16,19 @@ import (
 	"github.com/trevatk/go-template/internal/domain"
 )
 
-// HttpServer exposed endpoints
-type HttpServer struct {
+// HTTPServer exposed endpoints
+type HTTPServer struct {
 	log    *zap.SugaredLogger
 	bundle *domain.Bundle
 }
 
-// NewHttpServer create new http server instance
-func NewHttpServer(logger *zap.Logger, bundle *domain.Bundle) *HttpServer {
-	return &HttpServer{log: logger.Named("http server").Sugar(), bundle: bundle}
+// NewHTTPServer create new http server instance
+func NewHTTPServer(logger *zap.Logger, bundle *domain.Bundle) *HTTPServer {
+	return &HTTPServer{log: logger.Named("http server").Sugar(), bundle: bundle}
 }
 
 // NewRouter chi router implementation of http handler
-func NewRouter(httpServer *HttpServer) *chi.Mux {
+func NewRouter(httpServer *HTTPServer) *chi.Mux {
 
 	r := chi.NewRouter()
 
@@ -48,7 +49,7 @@ func NewRouter(httpServer *HttpServer) *chi.Mux {
 	return r
 }
 
-func (h *HttpServer) createPerson(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPServer) createPerson(w http.ResponseWriter, r *http.Request) {
 
 	request := &domain.NewPersonRequest{}
 	err := render.Bind(r, request)
@@ -72,7 +73,7 @@ func (h *HttpServer) createPerson(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *HttpServer) fetchPerson(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPServer) fetchPerson(w http.ResponseWriter, r *http.Request) {
 
 	sid := chi.URLParam(r, "id")
 	id, err := parseParamInt64(sid)
@@ -105,7 +106,7 @@ func (h *HttpServer) fetchPerson(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *HttpServer) updatePerson(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPServer) updatePerson(w http.ResponseWriter, r *http.Request) {
 
 	request := &domain.UpdatePersonRequest{}
 	err := render.Bind(r, request)
@@ -135,7 +136,7 @@ func (h *HttpServer) updatePerson(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *HttpServer) deletePerson(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPServer) deletePerson(w http.ResponseWriter, r *http.Request) {
 
 	sid := chi.URLParam(r, "id")
 	id, err := parseParamInt64(sid)
@@ -165,7 +166,7 @@ func (h *HttpServer) deletePerson(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *HttpServer) health(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPServer) health(w http.ResponseWriter, _ *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte("OK"))

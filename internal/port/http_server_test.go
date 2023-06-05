@@ -21,22 +21,21 @@ import (
 )
 
 var (
-	userId       int64 = 0
-	readUserId   int64 = 0
-	deleteUserId int64 = 0
+	readUserID   int64
+	deleteUserID int64
 )
 
 func init() {
-	os.Setenv("SQLITE_DSN", "./testfiles/sqlite/person.db")
-	os.Setenv("SQLITE_MIGRATIONS_DIR", "./../../migrations")
+	_ = os.Setenv("SQLITE_DSN", "./testfiles/sqlite/person.db")
+	_ = os.Setenv("SQLITE_MIGRATIONS_DIR", "./../../migrations")
 }
 
-type HttpServerSuite struct {
+type HTTPServerSuite struct {
 	suite.Suite
 	mux *chi.Mux
 }
 
-func (suite *HttpServerSuite) SetupTest() {
+func (suite *HTTPServerSuite) SetupTest() {
 
 	ctx := context.TODO()
 
@@ -60,7 +59,7 @@ func (suite *HttpServerSuite) SetupTest() {
 		Email:     "read.person@mailbox.com",
 	})
 	assert.NoError(err)
-	readUserId = readUser.ID
+	readUserID = readUser.ID
 
 	deletePerson, err := personService.Create(ctx, &domain.NewPerson{
 		FirstName: "delete",
@@ -68,16 +67,16 @@ func (suite *HttpServerSuite) SetupTest() {
 		Email:     "delete.person@mailbox.com",
 	})
 	assert.NoError(err)
-	deleteUserId = deletePerson.ID
+	deleteUserID = deletePerson.ID
 
 	bundle := domain.NewBundle(personService)
 
-	server := NewHttpServer(logger, bundle)
+	server := NewHTTPServer(logger, bundle)
 
 	suite.mux = NewRouter(server)
 }
 
-func (suite *HttpServerSuite) TestCreatePerson() {
+func (suite *HTTPServerSuite) TestCreatePerson() {
 
 	assert := assert.New(suite.T())
 
@@ -122,7 +121,7 @@ func (suite *HttpServerSuite) TestCreatePerson() {
 	}
 }
 
-func (suite *HttpServerSuite) TestFetchPerson() {
+func (suite *HTTPServerSuite) TestFetchPerson() {
 
 	assert := assert.New(suite.T())
 
@@ -133,7 +132,7 @@ func (suite *HttpServerSuite) TestFetchPerson() {
 		{
 			// success
 			expected: http.StatusAccepted,
-			endpoint: fmt.Sprintf("/api/v1/person/%d", readUserId),
+			endpoint: fmt.Sprintf("/api/v1/person/%d", readUserID),
 		},
 		{
 			// invalid URL parameter
@@ -162,7 +161,7 @@ func (suite *HttpServerSuite) TestFetchPerson() {
 	}
 }
 
-func (suite *HttpServerSuite) TestUpdatePerson() {
+func (suite *HTTPServerSuite) TestUpdatePerson() {
 
 	assert := assert.New(suite.T())
 
@@ -174,7 +173,7 @@ func (suite *HttpServerSuite) TestUpdatePerson() {
 			// success
 			person: &domain.UpdatePersonRequest{
 				UpdatePerson: &domain.UpdatePerson{
-					ID:        readUserId,
+					ID:        readUserID,
 					FirstName: "john",
 					LastName:  "doe",
 					Email:     "john.doe@mailbox.com",
@@ -193,7 +192,7 @@ func (suite *HttpServerSuite) TestUpdatePerson() {
 			// not found
 			person: &domain.UpdatePersonRequest{
 				UpdatePerson: &domain.UpdatePerson{
-					ID:        readUserId + 100,
+					ID:        readUserID + 100,
 					FirstName: "not",
 					LastName:  "found",
 					Email:     "not.found@mailbox.com",
@@ -219,7 +218,7 @@ func (suite *HttpServerSuite) TestUpdatePerson() {
 	}
 }
 
-func (suite *HttpServerSuite) TestDeletePerson() {
+func (suite *HTTPServerSuite) TestDeletePerson() {
 
 	assert := assert.New(suite.T())
 
@@ -230,7 +229,7 @@ func (suite *HttpServerSuite) TestDeletePerson() {
 		{
 			// success
 			expected: http.StatusAccepted,
-			endpoint: fmt.Sprintf("/api/v1/person/%d", deleteUserId),
+			endpoint: fmt.Sprintf("/api/v1/person/%d", deleteUserID),
 		},
 		{
 			// invalid URL parameter
@@ -240,7 +239,7 @@ func (suite *HttpServerSuite) TestDeletePerson() {
 		{
 			// not found
 			expected: http.StatusNotFound,
-			endpoint: fmt.Sprintf("/api/v1/person/%d", deleteUserId+999),
+			endpoint: fmt.Sprintf("/api/v1/person/%d", deleteUserID+999),
 		},
 	}
 
@@ -259,7 +258,7 @@ func (suite *HttpServerSuite) TestDeletePerson() {
 	}
 }
 
-func (suite *HttpServerSuite) TestHealth() {
+func (suite *HTTPServerSuite) TestHealth() {
 
 	assert := assert.New(suite.T())
 
@@ -293,5 +292,5 @@ func (suite *HttpServerSuite) TestHealth() {
 }
 
 func TestHttpServerSuite(t *testing.T) {
-	suite.Run(t, new(HttpServerSuite))
+	suite.Run(t, new(HTTPServerSuite))
 }

@@ -1,3 +1,4 @@
+// Package logging service logger
 package logging
 
 import (

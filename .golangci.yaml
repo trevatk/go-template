@@ -1,0 +1,25 @@
+linters-settings:
+  gosec:
+    exclude-generated: true
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+  skip-dirs:
+    - internal/repository
+
+linters:
+  enable:
+    - errcheck
+    - goimports
+    - revive
+    - govet
+    - staticcheck
+    - gosec
+    - bodyclose
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
