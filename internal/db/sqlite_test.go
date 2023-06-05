@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	os.Setenv("SQLITE_DSN", "./testfiles/sqlite/persons.db")
+	_ = os.Setenv("SQLITE_DSN", "./testfiles/sqlite/persons.db")
 }
 
 func TestNewSQLite(t *testing.T) {
@@ -19,5 +19,5 @@ func TestNewSQLite(t *testing.T) {
 	db, err := db.NewSQLite()
 	assert.NoError(err)
 
-	db.Close()
+	defer func() { _ = db.Close() }()
 }

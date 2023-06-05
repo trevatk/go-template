@@ -1,3 +1,4 @@
+// Package main service entrypoint
 package main
 
 import (
@@ -26,7 +27,7 @@ func main() {
 		fx.Provide(db.NewSQLite),
 		fx.Provide(domain.NewPersonService),
 		fx.Provide(domain.NewBundle),
-		fx.Provide(port.NewHttpServer),
+		fx.Provide(port.NewHTTPServer),
 		fx.Provide(port.NewRouter),
 		fx.Invoke(registerHooks),
 	)
@@ -58,8 +59,11 @@ func registerHooks(lc fx.Lifecycle, log *zap.Logger, handler http.Handler, sqlit
 	}
 
 	srv := &http.Server{
-		Addr:    ":" + port,
-		Handler: handler,
+		Addr:         ":" + port,
+		Handler:      handler,
+		ReadTimeout:  time.Second * 15,
+		WriteTimeout: time.Second * 15,
+		IdleTimeout:  time.Second * 15,
 	}
 
 	lc.Append(

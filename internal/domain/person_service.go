@@ -30,7 +30,7 @@ type NewPersonRequest struct {
 }
 
 // Bind callback used to validate new person request model
-func (npr *NewPersonRequest) Bind(r *http.Request) error {
+func (npr *NewPersonRequest) Bind(_ *http.Request) error {
 
 	if npr.NewPerson == nil {
 		return errors.New("no person details provided")
@@ -72,7 +72,7 @@ type UpdatePersonRequest struct {
 }
 
 // Bind callback used to validate update user request model
-func (upr *UpdatePersonRequest) Bind(r *http.Request) error {
+func (upr *UpdatePersonRequest) Bind(_ *http.Request) error {
 
 	if upr.UpdatePerson == nil {
 		return errors.New("invalid request object")
@@ -93,14 +93,14 @@ func NewPersonService(db *sql.DB) *PersonService {
 	}
 }
 
-// CreatePerson insert new person into database
+// Create insert new person into database
 func (ps *PersonService) Create(ctx context.Context, newPerson *NewPerson) (*Person, error) {
 
 	conn, err := ps.db.Conn(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get database connection %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	sqlPerson, err := persons.New(conn).InsertPerson(ctx, &persons.InsertPersonParams{
 		Fname: newPerson.FirstName,
@@ -111,7 +111,7 @@ func (ps *PersonService) Create(ctx context.Context, newPerson *NewPerson) (*Per
 		return nil, fmt.Errorf("failed to insert new person %v", err)
 	}
 
-	return transformSqlPerson(sqlPerson), nil
+	return transformSQLPerson(sqlPerson), nil
 }
 
 // ReadPerson retrieve person by id
@@ -121,7 +121,7 @@ func (ps *PersonService) Read(ctx context.Context, id int64) (*Person, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get database connection %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	sqlPerson, err := persons.New(conn).ReadPerson(ctx, id)
 	if err != nil {
@@ -133,17 +133,17 @@ func (ps *PersonService) Read(ctx context.Context, id int64) (*Person, error) {
 		return nil, fmt.Errorf("error executing read person query %v", err)
 	}
 
-	return transformSqlPerson(sqlPerson), nil
+	return transformSQLPerson(sqlPerson), nil
 }
 
-// UpdatePerson update existing person record
+// Update update existing person record
 func (ps *PersonService) Update(ctx context.Context, updatePerson *UpdatePerson) (*Person, error) {
 
 	conn, err := ps.db.Conn(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get database connection %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	sqlPerson, err := persons.New(conn).UpdatePerson(ctx, &persons.UpdatePersonParams{
 		Fname: updatePerson.FirstName,
@@ -160,7 +160,7 @@ func (ps *PersonService) Update(ctx context.Context, updatePerson *UpdatePerson)
 		return nil, fmt.Errorf("error executing update person query %v", err)
 	}
 
-	return transformSqlPerson(sqlPerson), nil
+	return transformSQLPerson(sqlPerson), nil
 }
 
 // Delete hard delete person record
@@ -170,7 +170,7 @@ func (ps *PersonService) Delete(ctx context.Context, id int64) error {
 	if err != nil {
 		return fmt.Errorf("failed to get database connection %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	result, err := persons.New(conn).DeletePerson(ctx, id)
 	if err != nil {
@@ -190,7 +190,7 @@ func (ps *PersonService) Delete(ctx context.Context, id int64) error {
 }
 
 // transform business model into application model
-func transformSqlPerson(sqlPerson *persons.Person) *Person {
+func transformSQLPerson(sqlPerson *persons.Person) *Person {
 
 	var person Person
 

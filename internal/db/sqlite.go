@@ -1,3 +1,4 @@
+// Package db service database connection
 package db
 
 import (
